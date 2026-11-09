@@ -1,0 +1,812 @@
+/* Lucian UX/UI Prompt #007 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#007 */
+/* Lucian UX/UI Prompt #039 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#039 */
+/* Lucian UX/UI Prompt #047 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#047 */
+
+:root {
+  color-scheme: dark;
+  --ux-page: #030304;
+  --ux-theater: #060608;
+  --ux-surface: #0B0B0F;
+  --ux-surface-2: #121218;
+  --ux-surface-3: #1B1B24;
+  --ux-ink: #F4F1EA;
+  --ux-ink-2: rgba(244, 241, 234, 0.64);
+  --ux-ink-3: rgba(244, 241, 234, 0.34);
+  --ux-line: rgba(255, 255, 255, 0.07);
+  --ux-line-2: rgba(255, 255, 255, 0.15);
+  --ux-accent: #E6C168;
+  --ux-accent-bright: #F2D382;
+  --ux-accent-soft: rgba(230, 193, 104, 0.14);
+  --ux-accent-ink: #0B0B0E;
+  --ux-green: #68D388;
+  --ux-glass: rgba(8, 8, 12, 0.78);
+  --ux-glass-line: rgba(255, 255, 255, 0.10);
+  --ux-shadow: 0 32px 96px rgba(0, 0, 0, 0.92), 0 0 1px rgba(255, 255, 255, 0.12);
+  --ux-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ux-spring: cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Display", "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  background-color: var(--ux-page);
+  color: var(--ux-ink);
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+.cinema-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.025) 0%, transparent 60%);
+}
+
+/* ==========================================================================
+   1. Minimalist Top Cinema Bar
+   ========================================================================== */
+.cinema-header {
+  height: 52px;
+  padding: 0 32px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  border-bottom: 1px solid var(--ux-line);
+  background: rgba(5, 5, 7, 0.86);
+  backdrop-filter: blur(16px);
+  z-index: 40;
+}
+
+.brand-cluster {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.aperture-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ux-accent);
+  box-shadow: 0 0 10px rgba(230, 193, 104, 0.7);
+}
+
+.cinema-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: var(--ux-ink);
+}
+
+.cinema-divider {
+  font-size: 11px;
+  color: var(--ux-ink-3);
+}
+
+.cinema-subtitle {
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--ux-ink-3);
+}
+
+/* Center Live Score Telemetry Pill */
+.score-telemetry {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--ux-line);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  transition: border-color 0.25s var(--ux-ease), box-shadow 0.25s var(--ux-ease);
+}
+
+.score-telemetry.active-draw,
+.score-telemetry.active-push {
+  border-color: rgba(230, 193, 104, 0.35);
+  box-shadow: 0 0 18px rgba(230, 193, 104, 0.08);
+}
+
+.telemetry-key {
+  font-weight: 650;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--ux-ink-3);
+  text-transform: uppercase;
+}
+
+.score-telemetry.active-draw .telemetry-key {
+  color: var(--ux-green);
+}
+
+.score-telemetry.active-push .telemetry-key {
+  color: var(--ux-accent);
+}
+
+.telemetry-sep {
+  color: var(--ux-ink-3);
+}
+
+.telemetry-note {
+  font-weight: 600;
+  color: var(--ux-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Right Telemetry Cluster */
+.meta-cluster {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+}
+
+.meta-fps {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ux-ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.meta-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--ux-surface);
+  border: 1px solid var(--ux-line);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--ux-ink-2);
+}
+
+.status-led {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ux-accent);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.status-led.ready {
+  background: var(--ux-green);
+  box-shadow: 0 0 8px rgba(104, 211, 136, 0.65);
+}
+
+/* ==========================================================================
+   2. Main Cinema Projection Stage
+   ========================================================================== */
+.cinema-stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 36px;
+  min-height: 0;
+}
+
+.screen-ambient-glow {
+  position: absolute;
+  width: 78%;
+  height: 78%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(230, 193, 104, 0.055) 0%, rgba(230, 193, 104, 0.015) 45%, transparent 72%);
+  filter: blur(42px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 1360px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000000;
+  border-radius: 14px;
+  border: 1px solid var(--ux-line);
+  box-shadow: var(--ux-shadow);
+  overflow: hidden;
+  z-index: 1;
+}
+
+#webcam,
+#video-source {
+  display: none;
+}
+
+#output-canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Standby Cinema Screen (Before video/camera starts) */
+.standby-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, #0B0B10 0%, #030305 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+  transition: opacity 0.45s var(--ux-ease), visibility 0.45s var(--ux-ease);
+}
+
+.standby-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.standby-frame-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: rgba(255, 255, 255, 0.14);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.standby-frame-corner.tl { top: 24px; left: 24px; border-width: 1px 0 0 1px; }
+.standby-frame-corner.tr { top: 24px; right: 24px; border-width: 1px 1px 0 0; }
+.standby-frame-corner.bl { bottom: 24px; left: 24px; border-width: 0 0 1px 1px; }
+.standby-frame-corner.br { bottom: 24px; right: 24px; border-width: 0 1px 1px 0; }
+
+.standby-content {
+  text-align: center;
+  max-width: 440px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.standby-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  color: var(--ux-accent);
+  text-transform: uppercase;
+}
+
+.standby-heading {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ux-ink);
+}
+
+.standby-desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ux-ink-2);
+  margin-bottom: 8px;
+}
+
+.standby-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Initial AI Loading Curtain */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 3, 5, 0.94);
+  backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  z-index: 60;
+  transition: opacity 0.45s var(--ux-ease);
+}
+
+.loader-ring {
+  width: 34px;
+  height: 34px;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-top-color: var(--ux-accent);
+  border-radius: 50%;
+  animation: cinema-spin 0.9s linear infinite;
+}
+
+@keyframes cinema-spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-caption {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--ux-ink-2);
+}
+
+/* ==========================================================================
+   3. Floating Cinema Transport Bar & Lucian #007 Play–Pause Morph
+   ========================================================================== */
+.video-player-bar {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 18px;
+  max-width: 880px;
+  margin: 0 auto;
+  height: 50px;
+  padding: 0 16px 0 8px;
+  background: var(--ux-glass);
+  backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid var(--ux-glass-line);
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.75);
+  z-index: 35;
+  transition: opacity 0.3s var(--ux-ease), transform 0.3s var(--ux-ease);
+}
+
+.video-player-bar.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+}
+
+/* Lucian UX/UI #007 Play–pause morph button */
+.u007-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(230, 193, 104, 0.35);
+  background: var(--ux-accent);
+  color: var(--ux-accent-ink);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: transform 0.25s var(--ux-spring), background 0.2s var(--ux-ease), box-shadow 0.2s var(--ux-ease);
+}
+
+.u007-btn:hover {
+  transform: scale(1.06);
+  background: var(--ux-accent-bright);
+  box-shadow: 0 0 18px rgba(230, 193, 104, 0.45);
+}
+
+.u007-btn:active {
+  transform: scale(0.94);
+}
+
+.u007-svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  display: block;
+}
+
+.timecode-cluster {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  min-width: 84px;
+}
+
+.time-val {
+  color: var(--ux-ink);
+}
+
+.time-slash,
+.time-dim {
+  color: var(--ux-ink-3);
+}
+
+.scrubber-track {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.scrubber-slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(90deg, var(--ux-accent) var(--progress, 0%), rgba(255, 255, 255, 0.14) var(--progress, 0%));
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+  transition: height 0.15s ease;
+}
+
+.scrubber-slider:hover {
+  height: 6px;
+}
+
+.scrubber-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ux-ink);
+  border: 2px solid var(--ux-accent);
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  transition: transform 0.18s var(--ux-spring);
+}
+
+.scrubber-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.3);
+}
+
+/* ==========================================================================
+   4. Bottom Minimalist Cinema Console
+   ========================================================================== */
+.cinema-console {
+  padding: 12px 32px;
+  background: rgba(6, 6, 9, 0.94);
+  border-top: 1px solid var(--ux-line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  z-index: 40;
+}
+
+.console-zone {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.zone-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--ux-ink-3);
+  text-transform: uppercase;
+}
+
+.zone-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Cinema Pill Buttons */
+.btn-cinema {
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  height: 36px;
+  padding: 0 15px;
+  border-radius: 999px;
+  border: 1px solid var(--ux-line-2);
+  background: var(--ux-surface-2);
+  color: var(--ux-ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  transition: all 0.22s var(--ux-ease);
+}
+
+.btn-cinema:hover {
+  background: var(--ux-surface-3);
+  border-color: rgba(255, 255, 255, 0.26);
+  transform: translateY(-1px);
+}
+
+.btn-cinema:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-cinema.active-cam {
+  border-color: rgba(230, 193, 104, 0.5);
+  color: var(--ux-accent);
+  background: rgba(230, 193, 104, 0.1);
+}
+
+.btn-cinema-gold {
+  background: var(--ux-accent);
+  color: var(--ux-accent-ink);
+  border-color: transparent;
+  font-weight: 650;
+}
+
+.btn-cinema-gold:hover {
+  background: var(--ux-accent-bright);
+  border-color: transparent;
+  box-shadow: 0 6px 20px rgba(230, 193, 104, 0.28);
+}
+
+.btn-cinema-sm {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 11.5px;
+}
+
+.file-label {
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   5. Lucian UX/UI #047 Stretchy Segmented Control (Layout Switcher)
+   ========================================================================== */
+.u047-seg {
+  --count: 3;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--count), 1fr);
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--ux-surface);
+  border: 1px solid var(--ux-line);
+  min-width: 246px;
+}
+
+.u047-knob {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: var(--l, 3px);
+  right: var(--r, calc(66.66%));
+  border-radius: 999px;
+  background: var(--ux-surface-3);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.u047-knob[data-dir="right"] {
+  transition: right 0.28s var(--ux-ease), left 0.48s var(--ux-spring) 0.06s;
+}
+
+.u047-knob[data-dir="left"] {
+  transition: left 0.28s var(--ux-ease), right 0.48s var(--ux-spring) 0.06s;
+}
+
+.u047-opt {
+  position: relative;
+  height: 30px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ux-ink-2);
+  cursor: pointer;
+  z-index: 2;
+  transition: color 0.22s var(--ux-ease);
+}
+
+.u047-opt:hover {
+  color: var(--ux-ink);
+}
+
+.u047-opt[aria-checked="true"] {
+  color: var(--ux-accent);
+}
+
+/* ==========================================================================
+   6. Lucian UX/UI #039 Sliding Pill Tabs (3-Option Score Selector)
+   ========================================================================== */
+.u039-tabs {
+  position: relative;
+  display: flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--ux-surface);
+  border: 1px solid var(--ux-line);
+}
+
+.u039-pill {
+  position: absolute;
+  left: 0;
+  top: 3px;
+  bottom: 3px;
+  width: var(--w, 88px);
+  border-radius: 999px;
+  background: var(--ux-accent);
+  transform: translateX(var(--x, 3px));
+  box-shadow: 0 2px 14px rgba(230, 193, 104, 0.28);
+  transition: transform 0.45s var(--ux-spring), width 0.45s var(--ux-spring);
+}
+
+.u039-tab {
+  position: relative;
+  height: 30px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--ux-ink-2);
+  white-space: nowrap;
+  cursor: pointer;
+  z-index: 2;
+  transition: color 0.22s var(--ux-ease);
+}
+
+.u039-tab:hover {
+  color: var(--ux-ink);
+}
+
+.u039-tab[aria-selected="true"] {
+  color: var(--ux-accent-ink);
+}
+
+/* ==========================================================================
+   7. Cinema Gain / Volume Control
+   ========================================================================== */
+.gain-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--ux-surface);
+  border: 1px solid var(--ux-line);
+}
+
+.gain-icon {
+  color: var(--ux-ink-2);
+  flex-shrink: 0;
+}
+
+.vol-slider {
+  width: 72px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(90deg, var(--ux-accent) var(--vol-pct, 25%), rgba(255, 255, 255, 0.14) var(--vol-pct, 25%));
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+}
+
+.vol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--ux-ink);
+  border: 2px solid var(--ux-accent);
+  cursor: pointer;
+  transition: transform 0.15s var(--ux-spring);
+}
+
+.vol-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+}
+
+.vol-readout {
+  font-size: 11.5px;
+  font-weight: 650;
+  color: var(--ux-accent);
+  font-variant-numeric: tabular-nums;
+  min-width: 32px;
+  text-align: right;
+}
+
+/* ==========================================================================
+   8. Export Progress Modal Overlay
+   ========================================================================== */
+.export-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 3, 5, 0.88);
+  backdrop-filter: blur(18px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 80;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ux-ease);
+}
+
+.export-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.export-card {
+  background: var(--ux-surface);
+  border: 1px solid var(--ux-line-2);
+  border-radius: 16px;
+  padding: 26px 30px;
+  width: 380px;
+  box-shadow: var(--ux-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.export-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.export-eyebrow {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: var(--ux-accent);
+}
+
+.export-card h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ux-ink);
+}
+
+.export-bar-bg {
+  width: 100%;
+  height: 5px;
+  background: var(--ux-surface-3);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.export-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--ux-accent);
+  border-radius: 999px;
+  transition: width 0.15s ease;
+}
+
+.export-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.export-status-text {
+  font-size: 12px;
+  color: var(--ux-ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .u039-pill,
+  .u047-knob,
+  .u007-btn {
+    transition: none !important;
+  }
+}

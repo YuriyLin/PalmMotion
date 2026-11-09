@@ -1,0 +1,176 @@
+<!-- Lucian UX/UI Prompt #007 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#007 -->
+<!-- Lucian UX/UI Prompt #039 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#039 -->
+<!-- Lucian UX/UI Prompt #047 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#047 -->
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCREENING ROOM — AI Accordion Cinema</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google MediaPipe Tasks Vision Bundle -->
+  <script src="vision_bundle.js"></script>
+</head>
+<body>
+  <div class="cinema-shell">
+    <!-- Minimalist Top Cinema Bar -->
+    <header class="cinema-header">
+      <div class="brand-cluster">
+        <span class="aperture-dot" aria-hidden="true"></span>
+        <span class="cinema-title">SCREENING ROOM</span>
+        <span class="cinema-divider" aria-hidden="true">/</span>
+        <span class="cinema-subtitle">ACOUSTIC MOTION STUDIO</span>
+      </div>
+
+      <!-- Subtle Live Note Telemetry (Keeps Video Canvas 100% Pure & Text-Free) -->
+      <div class="score-telemetry" id="score-telemetry">
+        <span class="telemetry-key" id="telemetry-state">STANDBY</span>
+        <span class="telemetry-sep">·</span>
+        <span class="telemetry-note" id="telemetry-note">Bella Ciao</span>
+      </div>
+
+      <div class="meta-cluster">
+        <span class="meta-fps" id="fps-badge">0.0 FPS</span>
+        <div class="meta-status">
+          <span class="status-led" id="status-led"></span>
+          <span id="status-badge">INITIALIZING</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Cinema Projection Stage -->
+    <main class="cinema-stage">
+      <div class="screen-ambient-glow" aria-hidden="true"></div>
+
+      <div class="canvas-wrapper" id="canvas-wrapper">
+        <video id="webcam" playsinline autoplay muted></video>
+        <video id="video-source" playsinline style="display:none;"></video>
+        <canvas id="output-canvas"></canvas>
+
+        <!-- Cinema Idle Standby Screen (Hidden once Camera or Video starts) -->
+        <div id="standby-overlay" class="standby-overlay">
+          <div class="standby-frame-corner tl"></div>
+          <div class="standby-frame-corner tr"></div>
+          <div class="standby-frame-corner bl"></div>
+          <div class="standby-frame-corner br"></div>
+          <div class="standby-content">
+            <span class="standby-eyebrow">PROJECTION READY · 35MM DIGITAL</span>
+            <h2 class="standby-heading">Select Input Reel or Live Lens</h2>
+            <p class="standby-desc">載入演講或手勢影片進行時間軸預覽與對比匯出，或開啟視訊鏡頭即時演奏。</p>
+            <div class="standby-actions">
+              <button type="button" id="btn-standby-video" class="btn-cinema btn-cinema-gold">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+                <span>載入影片檔案</span>
+              </button>
+              <button type="button" id="btn-standby-cam" class="btn-cinema">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>啟動視訊鏡頭</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Initial AI Engine Loading Curtain -->
+        <div id="loading-overlay" class="loading-overlay">
+          <div class="cinema-loader">
+            <div class="loader-ring"></div>
+          </div>
+          <p id="loading-text" class="loading-caption">CALIBRATING OPTICAL HAND LANDMARKER...</p>
+        </div>
+
+        <!-- Floating Cinema Transport & Timeline Scrubber Bar (Lucian #007 Play-Pause Morph) -->
+        <div id="video-player-bar" class="video-player-bar hidden">
+          <button id="btn-play-pause" class="u007-btn" type="button" aria-label="播放 / 暫停 (Space)" aria-pressed="false" title="播放 / 暫停 (Space)">
+            <svg class="u007-svg" viewBox="0 0 40 40" aria-hidden="true">
+              <polygon class="u007-l" points="13,8 22.5,13.6 22.5,26.4 13,32"></polygon>
+              <polygon class="u007-r" points="22.5,13.6 32,20 32,20 22.5,26.4"></polygon>
+            </svg>
+          </button>
+
+          <div class="timecode-cluster">
+            <span id="time-current" class="time-val">00:00</span>
+            <span class="time-slash">/</span>
+            <span id="time-total" class="time-val time-dim">00:00</span>
+          </div>
+
+          <div class="scrubber-track">
+            <input type="range" id="video-scrubber" class="scrubber-slider" min="0" max="100" step="0.1" value="0" style="--progress: 0%;">
+          </div>
+        </div>
+
+        <!-- Cinema Export Progress Overlay -->
+        <div id="export-modal" class="export-modal-overlay">
+          <div class="export-card">
+            <div class="export-header">
+              <span class="export-eyebrow">MASTERING REEL</span>
+              <h3>正在渲染並匯出影片</h3>
+            </div>
+            <div class="export-bar-bg">
+              <div id="export-bar-fill" class="export-bar-fill"></div>
+            </div>
+            <div class="export-footer">
+              <span id="export-status-text" class="export-status-text">進度：0%</span>
+              <button id="btn-cancel-export" class="btn-cinema btn-cinema-sm" type="button">中斷匯出</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Minimalist Cinema Console -->
+    <footer class="cinema-console">
+      <!-- Zone 1: Input & Master Export -->
+      <div class="console-zone">
+        <span class="zone-label">SOURCE</span>
+        <div class="zone-controls">
+          <button id="btn-toggle-cam" class="btn-cinema" type="button">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+            <span id="cam-btn-label">啟動鏡頭</span>
+          </button>
+
+          <label class="btn-cinema file-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>瀏覽影片</span>
+            <input type="file" id="video-input" accept="video/*" style="display:none;">
+          </label>
+
+          <button id="btn-export-video" class="btn-cinema btn-cinema-gold" type="button" style="display:none;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>匯出影片</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Zone 2: Aspect & Layout (Lucian UX/UI #047 Stretchy Segmented Control) -->
+      <div class="console-zone">
+        <span class="zone-label">ASPECT</span>
+        <div class="u047-seg" id="layout-seg" role="radiogroup" aria-label="畫面排版切換" style="--count: 3;">
+          <span class="u047-knob" id="layout-knob" aria-hidden="true"></span>
+          <button class="u047-opt" type="button" role="radio" data-layout="solo" aria-checked="true">單畫面</button>
+          <button class="u047-opt" type="button" role="radio" data-layout="side_by_side" aria-checked="false">左右對比</button>
+          <button class="u047-opt" type="button" role="radio" data-layout="vertical" aria-checked="false">上下直式</button>
+        </div>
+      </div>
+
+      <!-- Zone 3: 3-Option Score Selector (Lucian UX/UI #039 Sliding Pill Tabs) & Gain -->
+      <div class="console-zone">
+        <span class="zone-label">SCORE</span>
+        <div class="u039-tabs" id="song-tabs" role="tablist" aria-label="世界名曲選擇">
+          <span class="u039-pill" id="song-pill" aria-hidden="true"></span>
+          <button class="u039-tab" type="button" role="tab" data-song="bella_ciao" aria-selected="true">Bella Ciao</button>
+          <button class="u039-tab" type="button" role="tab" data-song="la_vie_en_rose" aria-selected="false">玫瑰人生</button>
+          <button class="u039-tab" type="button" role="tab" data-song="korobeiniki" aria-selected="false">俄羅斯方塊</button>
+        </div>
+
+        <div class="gain-control" title="手風琴音效音量 (預設 25%)">
+          <svg class="gain-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          <input type="range" id="slider-vol" class="vol-slider" min="0" max="100" value="25" style="--vol-pct: 25%;">
+          <span id="vol-val" class="vol-readout">25%</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
