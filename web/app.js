@@ -757,9 +757,11 @@ class PalmMotionWebStudio {
 
     if (results.landmarks && results.landmarks.length >= 2) {
       const hands = results.landmarks.map((lms) => {
-        const cx = (lms[0].x + lms[5].x + lms[9].x + lms[17].x) * 0.25 * w;
+        const rawX = (lms[0].x + lms[5].x + lms[9].x + lms[17].x) * 0.25 * w;
+        const cx = this.useVideoFile ? rawX : w - rawX;
         const cy = (lms[0].y + lms[5].y + lms[9].y + lms[17].y) * 0.25 * h;
-        const tilt = Math.atan2((lms[9].y - lms[0].y) * h, (lms[9].x - lms[0].x) * w);
+        const dx = (lms[9].x - lms[0].x) * w * (this.useVideoFile ? 1 : -1);
+        const tilt = Math.atan2((lms[9].y - lms[0].y) * h, dx);
         return { x: cx, y: cy, tilt };
       });
 
