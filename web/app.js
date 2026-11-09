@@ -266,6 +266,7 @@ class PalmMotionWebStudio {
     this.timeTotal = document.getElementById("time-total");
     this.videoScrubber = document.getElementById("video-scrubber");
     this.btnExportVideo = document.getElementById("btn-export-video");
+    this.exportBtnLabel = document.getElementById("export-btn-label");
 
     // Export Modal Elements
     this.exportModal = document.getElementById("export-modal");
@@ -362,7 +363,10 @@ class PalmMotionWebStudio {
     });
 
     // Export buttons
-    this.btnExportVideo.onclick = () => this.startExport();
+    this.btnExportVideo.onclick = () => {
+      if (this.isExporting && !this.useVideoFile) this.finishExport();
+      else if (!this.isExporting) this.startExport();
+    };
     this.btnCancelExport.onclick = () => this.cancelExport();
   }
 
@@ -424,6 +428,7 @@ class PalmMotionWebStudio {
 
     opts.forEach((opt, idx) => {
       opt.addEventListener("click", () => {
+        if (this.isExporting) return;
         if (idx === currentIdx) return;
         const dir = idx > currentIdx ? "right" : "left";
         opts[currentIdx].setAttribute("aria-checked", "false");
@@ -546,6 +551,7 @@ class PalmMotionWebStudio {
     const camLabel = document.getElementById("cam-btn-label");
 
     if (this.isCameraRunning) {
+      if (this.isExporting && !this.useVideoFile) this.finishExport();
       const stream = this.videoEl.srcObject;
       if (stream) stream.getTracks().forEach((t) => t.stop());
       this.isCameraRunning = false;
@@ -553,6 +559,7 @@ class PalmMotionWebStudio {
       btnCam.classList.remove("active-cam");
       camLabel.innerText = "啟動鏡頭";
       this.statusBadge.innerText = "STANDBY";
+      this.btnExportVideo.style.display = "none";
       return;
     }
 
@@ -573,7 +580,8 @@ class PalmMotionWebStudio {
       this.useVideoFile = false;
       this.standbyOverlay.classList.add("hidden");
       this.videoPlayerBar.classList.add("hidden");
-      this.btnExportVideo.style.display = "none";
+      this.btnExportVideo.style.display = "inline-flex";
+      this.exportBtnLabel.innerText = "開始錄製";
       btnCam.classList.add("active-cam");
       camLabel.innerText = "停止鏡頭";
       this.statusBadge.innerText = "LIVE LENS";
@@ -600,6 +608,7 @@ class PalmMotionWebStudio {
     this.videoSourceEl.onloadedmetadata = () => {
       this.videoPlayerBar.classList.remove("hidden");
       this.btnExportVideo.style.display = "inline-flex";
+      this.exportBtnLabel.innerText = "匯出影片";
       this.setPlayPauseGlyph(false, true);
       this.timeCurrent.innerText = "00:00";
       this.timeTotal.innerText = formatTime(this.videoSourceEl.duration);
@@ -1061,17 +1070,39 @@ class PalmMotionWebStudio {
 
   /* One-Click Video Exporter */
   async startExport() {
-    if (!this.useVideoFile || !this.videoSourceEl.duration) {
-      alert("請先載入影片檔案後再進行匯出！");
+    const recordingCamera = !this.useVideoFile && this.isCameraRunning;
+    if (!recordingCamera && (!this.useVideoFile || !this.videoSourceEl.duration)) {
+      alert("請先啟動鏡頭或載入影片檔案！");
+      return;
+    }
+    if (typeof MediaRecorder === "undefined" || !this.canvasEl.captureStream) {
+      alert("此瀏覽器不支援影片錄製，請改用支援 MediaRecorder 的瀏覽器。");
       return;
     }
 
     this.isExporting = true;
-    this.exportModal.classList.add("active");
+    if (recordingCamera) {
+      this.exportBtnLabel.innerText = "停止錄製並下載";
+      this.btnExportVideo.setAttribute("aria-pressed", "true");
+    } else {
+      this.exportModal.classList.add("active");
+    }
+    document.querySelectorAll("#layout-seg button").forEach((button) => { button.disabled = true; });
     this.exportBarFill.style.width = "0%";
     this.exportStatusText.innerText = "正在準備匯出管線...";
 
-    const canvasStream = this.canvasEl.captureStream(30);
+    let canvasStream;
+    try {
+      canvasStream = this.canvasEl.captureStream(30);
+    } catch (err) {
+      this.isExporting = false;
+      this.exportModal.classList.remove("active");
+      this.exportBtnLabel.innerText = recordingCamera ? "開始錄製" : "匯出影片";
+      this.btnExportVideo.setAttribute("aria-pressed", "false");
+      document.querySelectorAll("#layout-seg button").forEach((button) => { button.disabled = false; });
+      alert("無法擷取畫面：" + err.message);
+      return;
+    }
 
     let mixedStream = canvasStream;
     if (this.audio.streamDest) {
@@ -1096,31 +1127,65 @@ class PalmMotionWebStudio {
       }
     }
 
-    this.exportRecorder = new MediaRecorder(mixedStream, { mimeType: selectedMime });
+    try {
+      this.exportRecorder = new MediaRecorder(mixedStream, { mimeType: selectedMime });
+    } catch (err) {
+      canvasStream.getVideoTracks().forEach((track) => track.stop());
+      this.isExporting = false;
+      this.exportModal.classList.remove("active");
+      this.exportBtnLabel.innerText = recordingCamera ? "開始錄製" : "匯出影片";
+      this.btnExportVideo.setAttribute("aria-pressed", "false");
+      document.querySelectorAll("#layout-seg button").forEach((button) => { button.disabled = false; });
+      alert("無法開始錄製：" + err.message);
+      return;
+    }
     this.exportRecorder.ondataavailable = (e) => {
       if (e.data.size > 0) this.exportChunks.push(e.data);
     };
 
+    let exportFailed = false;
+    this.exportRecorder.onerror = (event) => {
+      exportFailed = true;
+      alert("錄製失敗：" + (event.error?.message || "瀏覽器無法完成錄製"));
+    };
     this.exportRecorder.onstop = () => {
-      const ext = selectedMime.includes("mp4") ? "mp4" : "webm";
-      const blob = new Blob(this.exportChunks, { type: selectedMime });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `AccordionCinema_${this.currentLayout}_${Date.now()}.${ext}`;
-      a.click();
+      if (!exportFailed) {
+        const ext = selectedMime.includes("mp4") ? "mp4" : "webm";
+        const blob = new Blob(this.exportChunks, { type: selectedMime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `AccordionCinema_${this.currentLayout}_${Date.now()}.${ext}`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+      }
+      canvasStream.getVideoTracks().forEach((track) => track.stop());
 
       this.exportModal.classList.remove("active");
       this.isExporting = false;
-      this.setPlayPauseGlyph(false);
-      this.audio.silence();
+      this.exportBtnLabel.innerText = this.useVideoFile ? "匯出影片" : "開始錄製";
+      this.btnExportVideo.setAttribute("aria-pressed", "false");
+      document.querySelectorAll("#layout-seg button").forEach((button) => { button.disabled = false; });
+      if (!recordingCamera) {
+        this.setPlayPauseGlyph(false);
+        this.audio.silence();
+      }
     };
 
-    this.videoSourceEl.currentTime = 0;
-    await this.videoSourceEl.play();
-    this.setPlayPauseGlyph(true);
-    this.exportRecorder.start();
-    requestAnimationFrame(() => this.processLoop());
+    try {
+      this.exportRecorder.start();
+      if (!recordingCamera) {
+        this.videoSourceEl.currentTime = 0;
+        await this.videoSourceEl.play();
+        this.setPlayPauseGlyph(true);
+        requestAnimationFrame(() => this.processLoop());
+      }
+    } catch (err) {
+      exportFailed = true;
+      if (this.exportRecorder.state !== "inactive") this.exportRecorder.stop();
+      else this.exportRecorder.onstop();
+      alert("無法開始錄製：" + err.message);
+    }
   }
 
   finishExport() {
