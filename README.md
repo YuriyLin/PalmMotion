@@ -17,6 +17,79 @@
 
 ---
 
+<p align="center">
+  <a href="#繁體中文">繁體中文</a> · <a href="#english">English</a>
+</p>
+
+## 繁體中文
+
+### 特色功能
+
+- **二次貝茲扇形風箱與雙手腕獨立傾角：** 風箱會依雙手距離自然展開或收合，左右琴身則各自跟隨對應手腕旋轉。
+- **名曲自動跟彈：** 內建《Bella Ciao》、《玫瑰人生》與《俄羅斯方塊》（Korobeiniki），依手部移動距離和推拉轉折推進旋律。
+- **極簡深色 Web Studio：** 位於 `web/`，提供影片時間軸、快捷操作、靜音和匯出功能，無需 Python 後端。
+- **多版型影片與 GIF 匯出：** 支援單畫面、16:9 左右對比、9:16 直式短影音，以及調色盤最佳化 GIF。
+
+### 快速開始
+
+需要 Python 3.10 以上版本（已使用 Python 3.12 測試）：
+
+```bash
+pip install -r requirements.txt
+python main.py
+```
+
+執行 `main.py` 開啟桌面控制台，可選擇 Webcam 或影片檔、切換曲目、預覽效果，並匯出影片或 GIF。
+
+### Web 版
+
+Web 版是位於 `web/` 的靜態網頁，不需要 Python 後端。可用以下命令在本機預覽：
+
+```bash
+python -m http.server 8000
+```
+
+接著開啟 <http://localhost:8000/web/>。此網站也可部署至 GitHub Pages；即時手勢追蹤需要相機權限。
+
+### 預覽快捷鍵
+
+| 按鍵 | 功能 |
+| :--- | :--- |
+| `Q` 或 `ESC` | 離開預覽 |
+| `SPACE` | 暫停或繼續播放 |
+| `N` | 切換下一首曲目：Bella Ciao → 玫瑰人生 → 俄羅斯方塊 |
+| `P` | 切換音高模式：名曲 → 和弦 → 滑音 → 固定 |
+| `C` | 切換貝茲彎曲風箱或直線風箱 |
+| `M` | 靜音或恢復手風琴音效 |
+| `R` | 重置追蹤濾波器與狀態 |
+
+### 命令列
+
+```bash
+# 使用預設 Webcam 即時互動
+python main.py --source 0
+
+# 播放影片並指定曲目
+python main.py --source speech.mp4 --song bella_ciao
+
+# 匯出 16:9 左右對比影片
+python main.py --source speech.mp4 --export compare.mp4 --layout side_by_side
+
+# 匯出 9:16 直式影片
+python main.py --source speech.mp4 --export reels.mp4 --layout vertical_9_16
+
+# 同時輸出 MP4 與 GIF
+python main.py --source speech.mp4 --export demo.mp4 --gif assets/demo.gif
+```
+
+### 授權
+
+本專案採用 MIT License，歡迎自由 Fork、修改與分享。
+
+---
+
+## English
+
 ## Key Features
 
 1. **Quadratic Bézier fan bellows and independent wrist angles**
